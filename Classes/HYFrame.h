@@ -3,6 +3,8 @@
 //  hydna-objc
 //
 
+#import <Foundation/Foundation.h>
+
 typedef enum {
     HEADER_SIZE = 0x05,
     LENGTH_OFFSET = 2
@@ -46,14 +48,16 @@ typedef enum {
     CTYPE_BINARY = 0x1
 } ContentTypes;
 
+
 // Upper payload limit (10kb)
+
 extern const unsigned int PAYLOAD_MAX_LIMIT;
 extern const unsigned int RESOLVE_CHANNEL;
 
 
-@interface HYFrame : NSObject {
-    NSMutableData *m_bytes;
-}
+@interface HYFrame : NSObject
+
+@property(nonatomic) NSMutableData *m_bytes;
 
 - (id)initWithChannel:(NSUInteger)ch
                 ctype:(NSUInteger)ctype

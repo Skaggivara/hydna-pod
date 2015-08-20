@@ -8,11 +8,6 @@
 
 @implementation HYChannelData
 
-/*
-@synthesize m_priority;
-@synthesize m_content;
-@synthesize m_binary;
-*/
 
 - (id)initWithPriority:(NSInteger)priority
                content:(NSData *)content

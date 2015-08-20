@@ -71,7 +71,7 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
 
 - (int)size
 {
-    return (unsigned int)[m_bytes length];
+    return (unsigned int)[self.m_bytes length];
 }
 
 - (const char *)data

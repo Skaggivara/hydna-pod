@@ -5,7 +5,6 @@
 
 #import "HYURL.h"
 
-
 @implementation HYURL
 
 - (id)initWithExpr:(NSString *)expr
@@ -77,14 +76,5 @@
     return self;
 }
 
-/*
-@synthesize m_port;
-@synthesize m_path;
-@synthesize m_host;
-@synthesize m_token;
-@synthesize m_auth;
-@synthesize m_protocol;
-@synthesize m_error;
-*/
 
 @end

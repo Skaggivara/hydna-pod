@@ -13,11 +13,11 @@
  */
 @interface HYOpenRequest : NSObject
 
-@property (nonatomic, strong, readonly,getter=channel) HYChannel *m_channel;
-@property (readonly,getter=ch) NSUInteger m_ch;
-@property (nonatomic, strong, readonly,getter=frame) HYFrame *m_frame;
-@property (nonatomic, strong, readonly,getter=path) NSString *m_path;
-@property (nonatomic, strong, readonly,getter=token) NSString *m_token;
+@property (nonatomic, strong, getter=channel) HYChannel *m_channel;
+@property (nonatomic,getter=ch) NSUInteger m_ch;
+@property (nonatomic, strong, getter=frame) HYFrame *m_frame;
+@property (nonatomic, strong, getter=path) NSString *m_path;
+@property (nonatomic, strong, getter=token) NSString *m_token;
 @property (getter=sent,setter=setSent:) BOOL m_sent;
     
 

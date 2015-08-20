@@ -3,6 +3,7 @@
 //  hydna-objc
 //
 
+#import <Foundation/Foundation.h>
 
 @interface HYChannelError : NSObject
 

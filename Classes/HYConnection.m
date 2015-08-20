@@ -713,7 +713,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #ifdef HYDNADEBUG
         debugPrint(@"Connection", 0, [NSString stringWithFormat:@"Redirected to location: %@", location]);
 #endif
-        HYURL *url = [[[HYURL alloc] initWithExpr:location]];
+        HYURL *url = [[HYURL alloc] initWithExpr:location];
         
         if (![[url protocol] isEqualToString:@"http"]) {
             if ([[url protocol] isEqualToString:@"https"]) {
@@ -1079,7 +1079,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
         NSString *m = @"";
         
         if ([payload length] > 0 && ctype == CTYPE_UTF8) {
-            m = [[NSString alloc] initWithBytes:payload length:[payload length] encoding:NSUTF8StringEncoding];
+            m = [[NSString alloc] initWithBytes:(__bridge const void *)(payload) length:[payload length] encoding:NSUTF8StringEncoding];
         }
         
         [channel destroy:[HYChannelError fromSigError:flag data:m]];

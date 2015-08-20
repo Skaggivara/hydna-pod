@@ -43,7 +43,7 @@
 
 + (NSArray *)addressesForHostname:(NSString *)hostname {
     // Get the addresses for the given hostname.
-    CFHostRef hostRef = CFHostCreateWithName(kCFAllocatorDefault, (CFStringRef)hostname);
+    CFHostRef hostRef = CFHostCreateWithName(kCFAllocatorDefault, (__bridge CFStringRef)hostname);
     BOOL isSuccess = CFHostStartInfoResolution(hostRef, kCFHostAddresses, nil);
     if (!isSuccess) { return nil; }
     CFArrayRef addressesRef = CFHostGetAddressing(hostRef, nil);
@@ -96,8 +96,8 @@
     // Get the hostnames for the host reference.
     CFArrayRef hostnamesRef = CFHostGetNames(hostRef, NULL);
     NSMutableArray *hostnames = [NSMutableArray array];
-    for (int currentIndex = 0; currentIndex < [(NSArray *)hostnamesRef count]; currentIndex++) {
-        [hostnames addObject:[(NSArray *)hostnamesRef objectAtIndex:currentIndex]];
+    for (int currentIndex = 0; currentIndex < [(__bridge NSArray *)hostnamesRef count]; currentIndex++) {
+        [hostnames addObject:[(__bridge NSArray *)hostnamesRef objectAtIndex:currentIndex]];
     }
     
     return hostnames;

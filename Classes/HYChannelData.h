@@ -6,10 +6,7 @@
 #import "HYFrame.h"
 
 
-@interface HYChannelData : NSObject {
-    NSInteger m_priority;
-    BOOL m_binary;
-}
+@interface HYChannelData : NSObject
 
 - (id)initWithPriority:(NSInteger)priority
                content:(NSData *)content
@@ -18,8 +15,8 @@
 - (BOOL)isBinaryContent;
 - (BOOL)isUtf8Content;
 
-@property (readonly, getter=priority) NSInteger m_priority;
-@property (readonly, getter=content) NSData *m_content;
-@property (readonly, getter=binary) BOOL m_binary;
+@property (nonatomic, getter=priority) NSInteger m_priority;
+@property (nonatomic, getter=content) NSData *m_content;
+@property (nonatomic, getter=binary) BOOL m_binary;
 
 @end
