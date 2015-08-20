@@ -47,32 +47,33 @@
 
 - (id)init
 {
-    if (!(self = [super init])) {
-        return nil;
+    self = [super init];
+    
+    if (self) {
+        self.m_ch = 0;
+        self.m_message = @"";
+        self.m_connection = nil;
+        self.m_connected = NO;
+        self.m_pendingClose = NO;
+        self.m_readable = NO;
+        self.m_writable = NO;
+        self.m_emitable = NO;
+        self.m_resolved = NO;
+        self.m_error = @"";
+        self.m_openRequest = nil;
+        self.m_resolveRequest = nil;
+    
+        self.m_dataQueue = [[NSMutableArray alloc] init];
+        self.m_signalQueue = [[NSMutableArray alloc] init];
+    
+        self.m_dataMutex = [[NSLock alloc] init];
+        self.m_signalMutex = [[NSLock alloc] init];
     }
-    
-    self.m_ch = 0;
-    self.m_message = @"";
-    self.m_connection = nil;
-    self.m_connected = NO;
-    self.m_pendingClose = NO;
-    self.m_readable = NO;
-    self.m_writable = NO;
-    self.m_emitable = NO;
-    self.m_resolved = NO;
-    self.m_error = @"";
-    self.m_openRequest = nil;
-    self.m_resolveRequest = nil;
-    
-    self.m_dataQueue = [[NSMutableArray alloc] init];
-    self.m_signalQueue = [[NSMutableArray alloc] init];
-    
-    self.m_dataMutex = [[NSLock alloc] init];
-    self.m_signalMutex = [[NSLock alloc] init];
     
     return self;
 }
 
+/*
 - (void)dealloc
 {
     [self.m_message release];
@@ -82,7 +83,7 @@
     [self.m_signalMutex release];
     
     [super dealloc];
-}
+}*/
 
 - (BOOL)getFollowRedirects
 {
@@ -179,11 +180,11 @@
     self.m_writable = ((self.m_mode & WRITE) == WRITE);
     self.m_emitable = ((self.m_mode & EMIT) == EMIT);
     
-    HYURL* url = [[[HYURL alloc] initWithExpr:expr] autorelease];
+    HYURL *url = [[HYURL alloc] initWithExpr:expr];
     
     unichar slash = '/';
     
-    if (![[url protocol] isEqualToString:@"http" ]) {
+    if (![[url protocol] isEqualToString:@"http"]) {
         if ([[url protocol] isEqualToString:@"https"]) {
             [NSException raise:@"Error" format:@"The protocol HTTPS is not supported"];
         } else {
@@ -217,7 +218,7 @@
     request = [[HYOpenRequest alloc] initWith:self ch:self.m_ch path:self.m_path token:self.m_token frame:frame];
     
     if (![self.m_error isEqualToString: @""]) {
-        [self.m_error release];
+        //[self.m_error release];
     }
     
     self.m_error = @"";
@@ -368,11 +369,11 @@
             [self.m_connectMutex unlock];
             
             [connection writeBytes:frame];
-            [frame release];
+            //[frame release];
         }
         @catch (NSException *e) {
             [self.m_connectMutex unlock];
-            [frame release];
+            //[frame release];
             [self destroy:[HYChannelError errorWithDesc:[e reason] wasClean:NO hadError:YES wasDenied:NO]];
         }
     }
@@ -440,14 +441,14 @@
             [self.m_connectMutex unlock];
             
             [connection writeBytes:frame];
-            [frame release];
+            //[frame release];
         }
         @catch (NSException *e) {
             // Something wen't terrible wrong. Queue frame and wait
             // for a reconnect.
             
             [self.m_connectMutex unlock];
-            [frame release];
+            //[frame release];
             [self destroy:[HYChannelError errorWithDesc:[e reason] wasClean:NO hadError:YES wasDenied:NO]];
         }
     } else {

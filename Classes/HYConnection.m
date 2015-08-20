@@ -44,7 +44,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 @property (atomic, strong) NSMutableDictionary *m_pendingResolveRequests;
 @property (atomic, strong) NSMutableDictionary *m_openChannels;
 @property (atomic, strong) NSMutableDictionary *m_openWaitQueue;
-@property (atomic, strong) NSMutableDictionary *m_resolveWaitQueue;;
+@property (atomic, strong) NSMutableDictionary *m_resolveWaitQueue;
 
 @property (atomic, strong) NSLock *m_channelRefMutex;
 @property (nonatomic, strong) NSLock *m_destroyingMutex;
@@ -205,46 +205,49 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
               port:(NSUInteger)port
               auth:(NSString *)auth
 {
-    if (!(self = [super init])) {
-        return nil;
+    
+    self = [super init];
+    
+    if (self) {
+
+        self.m_channelRefMutex = [[NSLock alloc] init];
+        self.m_destroyingMutex = [[NSLock alloc] init];
+        self.m_closingMutex = [[NSLock alloc] init];
+        self.m_openChannelsMutex = [[NSLock alloc] init];
+        self.m_openWaitMutex = [[NSLock alloc] init];
+        self.m_pendingMutex = [[NSLock alloc] init];
+        self.m_listeningMutex = [[NSLock alloc] init];
+    
+        self.m_resolveMutex = [[NSLock alloc] init];
+        self.m_resolveWaitMutex = [[NSLock alloc] init];
+        self.m_resolveChannelsMutex = [[NSLock alloc] init];
+    
+        self.m_connecting = NO;
+        self.m_connected = NO;
+        self.m_handshaked = NO;
+        self.m_destroying = NO;
+        self.m_closing = NO;
+        self.m_listening = NO;
+        self.m_resolved = NO;
+    
+        self.m_host = host;
+        self.m_port = port;
+        self.m_auth = auth;
+        self.m_attempt = 0;
+    
+        self.m_pendingOpenRequests = [[NSMutableDictionary alloc] init];
+        self.m_pendingResolveRequests = [[NSMutableDictionary alloc] init];
+        self.m_openChannels = [[NSMutableDictionary alloc] init];
+        self.m_openWaitQueue = [[NSMutableDictionary alloc] init];
+        self.m_resolveWaitQueue = [[NSMutableDictionary alloc] init];
+    
+        self.m_channelRefCount = 0;
     }
-    
-    self.m_channelRefMutex = [[NSLock alloc] init];
-    self.m_destroyingMutex = [[NSLock alloc] init];
-    self.m_closingMutex = [[NSLock alloc ] init];
-    self.m_openChannelsMutex = [[NSLock alloc ] init];
-    self.m_openWaitMutex = [[NSLock alloc ] init];
-    self.m_pendingMutex = [[NSLock alloc ] init];
-    self.m_listeningMutex = [[NSLock alloc ] init];
-    
-    self.m_resolveMutex = [[NSLock alloc ] init];
-    self.m_resolveWaitMutex = [[NSLock alloc ] init];
-    self.m_resolveChannelsMutex = [[NSLock alloc ] init];
-    
-    self.m_connecting = NO;
-    self.m_connected = NO;
-    self.m_handshaked = NO;
-    self.m_destroying = NO;
-    self.m_closing = NO;
-    self.m_listening = NO;
-    self.m_resolved = NO;
-    
-    self.m_host = host;
-    self.m_port = port;
-    self.m_auth = auth;
-    self.m_attempt = 0;
-    
-    self.m_pendingOpenRequests = [[NSMutableDictionary alloc ] init];
-    self.m_pendingResolveRequests = [[NSMutableDictionary alloc ] init];
-    self.m_openChannels = [[NSMutableDictionary alloc ] init];
-    self.m_openWaitQueue = [[NSMutableDictionary alloc ] init];
-    self.m_resolveWaitQueue = [[NSMutableDictionary alloc ] init];
-    
-    self.m_channelRefCount = 0;
     
     return self;
 }
 
+/*
 - (void)dealloc
 {
     [self.m_channelRefMutex release];
@@ -267,6 +270,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
     
     [super dealloc];
 }
+*/
 
 - (BOOL)hasHandshaked
 {
@@ -345,7 +349,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #ifdef HYDNADEBUG
         debugPrint(@"Connection", 0, @"The channel was already resolved, cancel the resolve request");
 #endif
-        [request release];
+        //[request release];
         return NO;
     }
     
@@ -407,7 +411,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #ifdef HYDNADEBUG
         debugPrint(@"Connection", chcomp, @"The channel was already open, cancel the open request");
 #endif
-        [request release];
+        //[request release];
         return NO;
     }
     [self.m_openChannelsMutex unlock];
@@ -473,7 +477,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
     
     [self.m_pendingMutex lock];
     if ([self.m_pendingOpenRequests objectForKey:channelcomp] != nil) {
-        [[self.m_pendingOpenRequests objectForKey:channelcomp] release];
+        //[[self.m_pendingOpenRequests objectForKey:channelcomp] = nil;
         [self.m_pendingOpenRequests removeObjectForKey:channelcomp];
         
         if (queue && [queue count] > 0) {
@@ -498,7 +502,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
         [queue removeObjectAtIndex:0];
         
         if (r == request) {
-            [r release];
+            //[r release];
             found = YES;
         } else {
             [tmp addObject:r];
@@ -709,7 +713,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #ifdef HYDNADEBUG
         debugPrint(@"Connection", 0, [NSString stringWithFormat:@"Redirected to location: %@", location]);
 #endif
-        HYURL *url = [[[HYURL alloc] initWithExpr:location] autorelease];
+        HYURL *url = [[[HYURL alloc] initWithExpr:location]];
         
         if (![[url protocol] isEqualToString:@"http"]) {
             if ([[url protocol] isEqualToString:@"https"]) {
@@ -764,7 +768,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 
 - (void)receiveHandler
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     NSUInteger size;
     NSUInteger headerSize = HEADER_SIZE;
@@ -792,6 +796,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
         if (n <= 0) {
             [self.m_listeningMutex lock];
             if (self.m_listening) {
+                // TODO: maybe this is placed wrong
                 [self.m_listeningMutex unlock];
                 [self destroy:[HYChannelError errorWithDesc:@"Could not read from the connection" wasClean:NO hadError:YES wasDenied:NO]];
             } else {
@@ -868,7 +873,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #ifdef HYDNADEBUG
     debugPrint(@"Connection", 0, @"Listening thread exited");
 #endif
-    [pool release];
+    //[pool release];
 }
 
 - (void)processResolveFrameWithChannelId:(NSUInteger)ch
@@ -908,7 +913,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
     }
     
     [self.m_resolveMutex lock];
-    [request release];
+    //[request release];
     [self.m_pendingResolveRequests removeObjectForKey:path];
     [self.m_resolveMutex unlock];
 }
@@ -959,7 +964,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
         }
     } else {
         [self.m_pendingMutex lock];
-        [request release];
+        //[request release];
         
         [self.m_pendingOpenRequests removeObjectForKey:[NSNumber numberWithInteger:ch]];
         [self.m_pendingMutex unlock];
@@ -969,7 +974,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
         
         if ([payload length] > 0) {
             m = [[NSString alloc] initWithBytes:data length:[payload length] encoding:NSUTF8StringEncoding];
-            [m autorelease];
+            //[m autorelease];
         } else {
             m = @"";
         }
@@ -1006,7 +1011,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
     if (queue != nil) {
         // Destroy all pending request IF response wasn't a redirect channel.
         if (respch == ch) {
-            [[self.m_pendingOpenRequests objectForKey:[NSNumber numberWithInteger:ch]] release];
+            //[[self.m_pendingOpenRequests objectForKey:[NSNumber numberWithInteger:ch]] release];
             [self.m_pendingOpenRequests removeObjectForKey:[NSNumber numberWithInteger:ch]];
             
             while ([queue count] > 0) {
@@ -1024,14 +1029,14 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
         [self.m_pendingOpenRequests setObject:request forKey:[NSNumber numberWithInteger:ch]];
         
         if ([queue count] == 0) {
-            [[self.m_openWaitQueue objectForKey:[NSNumber numberWithInteger:ch]] release];
-            [self.m_openWaitQueue removeObjectForKey:[ NSNumber numberWithInteger:ch]];
+            //[[self.m_openWaitQueue objectForKey:[NSNumber numberWithInteger:ch]] release];
+            [self.m_openWaitQueue removeObjectForKey:[NSNumber numberWithInteger:ch]];
         }
         
         [self writeBytes:[request frame]];
         [request setSent:YES];
     } else {
-        [[self.m_pendingOpenRequests objectForKey:[NSNumber numberWithInteger:ch]] release];
+        //[[self.m_pendingOpenRequests objectForKey:[NSNumber numberWithInteger:ch]] release];
         [self.m_pendingOpenRequests removeObjectForKey:[NSNumber numberWithInteger:ch]];
     }
     [self.m_pendingMutex unlock];
@@ -1152,7 +1157,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
             }
 
             @catch (NSException *e) {
-                [payload release];
+                //[payload release];
                 [self destroy:[HYChannelError errorWithDesc:[e reason] wasClean:NO hadError:YES wasDenied:NO]];
             }
             
@@ -1187,7 +1192,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #endif
         HYOpenRequest *resolveReq = [self.m_pendingResolveRequests objectForKey:key];
         [resolveReq.channel destroy:error];
-        [resolveReq release];
+        //[resolveReq release];
     }
     [self.m_pendingResolveRequests removeAllObjects];
     [self.m_resolveMutex unlock];
@@ -1204,7 +1209,7 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #endif
         HYOpenRequest *openReq = [self.m_pendingOpenRequests objectForKey:key];
         [openReq.channel destroy:error];
-        [openReq release];
+        //[openReq release];
     }
     [self.m_pendingOpenRequests removeAllObjects];
     [self.m_pendingMutex unlock];

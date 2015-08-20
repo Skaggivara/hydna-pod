@@ -54,7 +54,7 @@ extern const unsigned int MAX_REDIRECT_ATTEMPTS;
               port:(NSUInteger)port
               auth:(NSString *)auth;
 
-- (void)dealloc;
+//- (void)dealloc;
 
 /**
  *  Returns the handshake status of the connection.

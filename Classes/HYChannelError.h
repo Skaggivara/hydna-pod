@@ -16,7 +16,7 @@
  wasClean (boolean) true if the channel was cleanly ended (either by calling channel.close() or from a Behavior).
  */
 
-@property(nonatomic, strong) NSString *reason;
+@property(nonatomic, copy) NSString *reason;
 @property(nonatomic) BOOL wasClean;
 @property(nonatomic) BOOL hadError;
 @property(nonatomic) BOOL wasDenied;

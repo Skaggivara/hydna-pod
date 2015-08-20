@@ -21,20 +21,21 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
     if ([payload length] > PAYLOAD_MAX_LIMIT) {
         [NSException raise:@"RangeError" format:@"Payload max limit reached"];
     }
+    
+    self = [super init];
         
-    if (!(self = [super init])) {
-        return nil;
-    }
+    if (self) {
+        
+        self.m_bytes = [[NSMutableData alloc] initWithCapacity:(length+LENGTH_OFFSET)];
     
-    self->m_bytes = [[NSMutableData alloc] initWithCapacity:(length+LENGTH_OFFSET)];
+        [self writeShort:length];
+        [self writeUnsignedInt:(unsigned int)ch];
     
-    [self writeShort:length];
-    [self writeUnsignedInt:(unsigned int)ch];
+        [self writeByte:((ctype << CTYPE_BITPOS) | (op << OP_BITPOS) | (flag & 7))];
     
-    [self writeByte:((ctype << CTYPE_BITPOS) | (op << OP_BITPOS) | (flag & 7))];
-    
-    if (payload) {
-        [self writeBytes: payload];
+        if (payload) {
+            [self writeBytes: payload];
+        }
     }
     
     return self;
@@ -42,12 +43,12 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
 
 - (void)writeByte:(char)value
 {
-    [m_bytes appendBytes:&value length:1];
+    [self.m_bytes appendBytes:&value length:1];
 }
 
-- (void) writeBytes:(NSData *)value
+- (void)writeBytes:(NSData *)value
 {
-    [m_bytes appendData:value];
+    [self.m_bytes appendData:value];
 }
 
 - (void)writeShort:(short)value
@@ -56,7 +57,7 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
     
     *(short*)&result[0] = htons(value);
     
-    [m_bytes appendBytes:result length:2];
+    [self.m_bytes appendBytes:result length:2];
 }
 
 - (void)writeUnsignedInt:(unsigned int)value
@@ -65,7 +66,7 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
     
     *(unsigned int*)&result[0] = htonl(value);
     
-    [m_bytes appendBytes:result length:4];
+    [self.m_bytes appendBytes:result length:4];
 }
 
 - (int)size
@@ -75,7 +76,7 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
 
 - (const char *)data
 {
-    return [m_bytes bytes];
+    return [self.m_bytes bytes];
 }
 
 - (void)setChannel:(NSUInteger)value
@@ -84,7 +85,7 @@ const unsigned int RESOLVE_CHANNEL = 0x0;
     
     *(unsigned int*)&result[0] = htonl(value);
     
-    [m_bytes replaceBytesInRange:NSMakeRange(3, 4) withBytes:result];
+    [self.m_bytes replaceBytesInRange:NSMakeRange(3, 4) withBytes:result];
 }
 
 @end

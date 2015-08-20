@@ -21,16 +21,17 @@
 - (id)initWithDesc:(NSString *)reason
           wasClean:(BOOL)clean
           hadError:(BOOL)error
-         wasDenied:(BOOL)denied{
-
-    if (!(self = [super init])) {
-        return nil;
-    }
+         wasDenied:(BOOL)denied
+{
     
-    self.reason = reason;
-    self.wasClean = clean;
-    self.hadError = error;
-    self.wasDenied = denied;
+    self = [super init];
+    
+    if (self) {
+        self.reason = reason;
+        self.wasClean = clean;
+        self.hadError = error;
+        self.wasDenied = denied;
+    }
     
     return self;
 }
@@ -51,7 +52,7 @@
 {
     NSString *msg = @"";
     
-    HYChannelError * err = [HYChannelError errorWithDesc:msg wasClean:YES hadError:NO wasDenied:YES];
+    HYChannelError *err = [HYChannelError errorWithDesc:msg wasClean:YES hadError:NO wasDenied:YES];
     
     if (![data isEqualToString:@""] || [data length] != 0) {
         msg = data;
