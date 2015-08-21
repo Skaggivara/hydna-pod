@@ -54,7 +54,7 @@
         self.m_message = @"";
         self.m_connection = nil;
         self.m_connected = NO;
-        self.m_pendingClose = NO;
+        self.m_pendingClose = nil;
         self.m_readable = NO;
         self.m_writable = NO;
         self.m_emitable = NO;

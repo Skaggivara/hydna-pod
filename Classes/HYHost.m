@@ -55,7 +55,9 @@
     CFIndex numAddresses = CFArrayGetCount(addressesRef);
     for (CFIndex currentIndex = 0; currentIndex < numAddresses; currentIndex++) {
         struct sockaddr *address = (struct sockaddr *)CFDataGetBytePtr(CFArrayGetValueAtIndex(addressesRef, currentIndex));
-        if (address == nil) { return nil; }
+        if (!address) {
+            return nil;
+        }
         getnameinfo(address, address->sa_len, ipAddress, INET6_ADDRSTRLEN, nil, 0, NI_NUMERICHOST);
         if (ipAddress == nil) { return nil; }
         [addresses addObject:[NSString stringWithCString:ipAddress encoding:NSASCIIStringEncoding]];
