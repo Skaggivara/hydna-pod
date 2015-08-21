@@ -385,7 +385,6 @@ const unsigned int MAX_REDIRECT_ATTEMPTS = 5;
 #ifdef HYDNADEBUG
         debugPrint(@"Connection", chcomp, @"The channel was already open, cancel the open request");
 #endif
-        // TODO: this return was remote to handle error, when rapidly connecting and disconnecting
         //return NO;
     }
     [self.m_openChannelsMutex unlock];
