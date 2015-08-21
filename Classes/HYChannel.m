@@ -27,7 +27,7 @@
 @property(nonatomic) BOOL m_emitable;
 @property(nonatomic) BOOL m_resolved;
 
-@property(nonatomic, strong) NSString *m_error;
+@property(nonatomic, copy) NSString *m_error;
 
 @property(nonatomic) NSUInteger m_mode;
 
@@ -370,7 +370,7 @@
                  token:(NSString *)token
 {
     
-    if(self.m_resolved == YES){
+    if (self.m_resolved == YES) {
         [NSException raise:@"Error" format:@"Channel is already resolved"];
     }
 
@@ -385,11 +385,12 @@
 
     // TODO: check other error method
     if (![self.m_connection requestOpen:request]) {
+        
+        // TODO: validate that this works
         [NSException raise:@"Error" format:@"Channel already open"];
     }
-
+    
     self.m_openRequest = request;
-
     self.m_resolved = YES;
 }
 
@@ -439,7 +440,7 @@
     } else {
         
         // TODO: validate
-        if (self.delegate && [self.delegate respondsToSelector:@selector(channelOpen:message:)]) {
+        if ([self.delegate respondsToSelector:@selector(channelOpen:message:)]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.delegate channelOpen:self message:message];
             });
@@ -493,7 +494,7 @@
     // TODO: test if no error
     
     if (error) {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(channelClose:error:)]) {
+        if ([self.delegate respondsToSelector:@selector(channelClose:error:)]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.delegate channelClose:self error:error];
             });
@@ -504,7 +505,7 @@
 - (void)addData:(HYChannelData *)data
 {
     // TODO: validate
-    if (self.delegate && [self.delegate respondsToSelector:@selector(channelMessage:data:)]) {
+    if ([self.delegate respondsToSelector:@selector(channelMessage:data:)]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.delegate channelMessage:self data:data];
         });
@@ -543,7 +544,7 @@
 - (void)addSignal:(HYChannelSignal *)signal
 {
     // TODO: validate
-    if (self.delegate && [self.delegate respondsToSelector:@selector(channelSignal:data:)]) {
+    if ([self.delegate respondsToSelector:@selector(channelSignal:data:)]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.delegate channelSignal:self data:signal];
         });

@@ -45,7 +45,7 @@ typedef enum {
 
 @interface HYChannel : NSObject
 
-@property(nonatomic, assign) id <HYChannelDelegate> delegate;
+@property(nonatomic, weak) id <HYChannelDelegate> delegate;
 
 /**
  *  Initializes a new Channel instance
