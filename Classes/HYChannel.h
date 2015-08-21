@@ -52,8 +52,6 @@ typedef enum {
  */
 - (id)init;
 
-//- (void)dealloc;
-
 /**
  *  Checks if redirects should be followed.
  *

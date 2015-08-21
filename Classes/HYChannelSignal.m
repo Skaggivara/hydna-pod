@@ -34,8 +34,5 @@
 {
     return !self.m_binary;
 }
-/*
-@synthesize m_type;
-@synthesize m_content;
-*/
+
 @end

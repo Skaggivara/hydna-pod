@@ -73,18 +73,6 @@
     return self;
 }
 
-/*
-- (void)dealloc
-{
-    [self.m_message release];
-    [self.m_dataQueue release];
-    [self.m_dataMutex release];
-    [self.m_signalQueue release];
-    [self.m_signalMutex release];
-    
-    [super dealloc];
-}*/
-
 - (BOOL)getFollowRedirects
 {
     return [HYConnection getFollowRedirects];
@@ -369,11 +357,9 @@
             [self.m_connectMutex unlock];
             
             [connection writeBytes:frame];
-            //[frame release];
         }
         @catch (NSException *e) {
             [self.m_connectMutex unlock];
-            //[frame release];
             [self destroy:[HYChannelError errorWithDesc:[e reason] wasClean:NO hadError:YES wasDenied:NO]];
         }
     }
@@ -397,6 +383,7 @@
     
     request = [[HYOpenRequest alloc] initWith:self ch:self.m_ch path:path token:token frame:frame];
 
+    // TODO: check other error method
     if (![self.m_connection requestOpen:request]) {
         [NSException raise:@"Error" format:@"Channel already open"];
     }
@@ -441,14 +428,12 @@
             [self.m_connectMutex unlock];
             
             [connection writeBytes:frame];
-            //[frame release];
         }
         @catch (NSException *e) {
             // Something wen't terrible wrong. Queue frame and wait
             // for a reconnect.
             
             [self.m_connectMutex unlock];
-            //[frame release];
             [self destroy:[HYChannelError errorWithDesc:[e reason] wasClean:NO hadError:YES wasDenied:NO]];
         }
     } else {
@@ -571,7 +556,7 @@
 
 - (HYChannelSignal *)popSignal
 {
-    if ([self isSignalEmpty]){
+    if ([self isSignalEmpty]) {
         return nil;
     }
     
